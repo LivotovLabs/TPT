@@ -1,5 +1,6 @@
 *.class
 .idea
+out
 *.jpr
 *.iml
 
