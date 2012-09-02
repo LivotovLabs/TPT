@@ -177,7 +177,7 @@ LICENSE INFORMATION REGARDING BUNDLED THIRD-PARTY SOFTWARE
 The following third party software is distributed with Toolkit Productivity Tools
 and is provided under other licenses and/or has source available from other locations.
 
-* ITMill Toolkit
+* Vaadin
   License: Apache License v. 2.0 (above)
-  Source code availability: http://www.itmill.com
+  Source code availability: http://vaadin.com
 
