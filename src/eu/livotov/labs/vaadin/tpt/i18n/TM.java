@@ -20,7 +20,7 @@ import com.vaadin.Application;
 import eu.livotov.labs.vaadin.tpt.TPTApplication;
 import java.io.Serializable;
 
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Translation manager - a front-end for toolkit-enabled application for getting locale-dependant
@@ -72,6 +72,28 @@ public class TM implements Serializable
     }
 
     /**
+     * Provides the translated string by the given key. ote, that this method only works if your
+     * application extends ToolkitPlusApplication. For plain ITMill Toolkit applications please use
+     * another method, that accepts application instance as a parameter.
+     *
+     * @param key key to get string for
+     * @param params - set of String.format parameters to parse
+     * @return key translation, for the current application instance language
+     */
+    public static String get ( final String key, Locale locale, Object... params )
+    {
+        String phrase = getDictionary ().get ( key );
+
+        if ( params != null && params.length>0)
+        {
+            return String.format(locale, phrase, params);
+        } else
+        {
+            return phrase;
+        }
+    }
+
+    /**
      * Provides the translated string by the given key
      *
      * @param app application to look for the keys in
@@ -86,6 +108,27 @@ public class TM implements Serializable
         if ( params != null && params.length>0)
         {
             return String.format(phrase, params);
+        } else
+        {
+            return phrase;
+        }
+    }
+
+    /**
+     * Provides the translated string by the given key
+     *
+     * @param app application to look for the keys in
+     * @param key key to get string for
+     * @param params - set of String.format parameters to parse
+     * @return key translation, for the current application instance language
+     */
+    public static String get ( Application app, final String key, Locale locale, Object... params )
+    {
+        String phrase = getDictionary ( app ).get ( app, key );
+
+        if ( params != null && params.length>0)
+        {
+            return String.format(locale, phrase, params);
         } else
         {
             return phrase;
@@ -131,4 +174,23 @@ public class TM implements Serializable
         return translationDictionaries.get ( app.getClass ().getCanonicalName () );
     }
 
+    public static Set<String> getAvailableLanguages()
+    {
+        return getAvailableLanguages(TPTApplication.getCurrentApplication());
+    }
+
+    public static Set<String> getAvailableLanguages( Application app)
+    {
+        Map<String,String> languages = new HashMap<String, String>();
+
+        for (Dictionary dictionary : translationDictionaries.values())
+        {
+            for (String language : dictionary.countries.keySet())
+            {
+                languages.put(language,"");
+            }
+        }
+
+        return languages.keySet();
+    }
 }

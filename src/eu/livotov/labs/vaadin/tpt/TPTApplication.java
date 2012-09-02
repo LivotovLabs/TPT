@@ -37,19 +37,19 @@ public abstract class TPTApplication extends Application
         implements ApplicationContext.TransactionListener
 {
 
-    static ThreadLocal<TPTApplication> currentApplication = new ThreadLocal<TPTApplication> ();
+    static ThreadLocal<TPTApplication> currentApplication = new ThreadLocal<TPTApplication>();
     private Dictionary internationalizationDictionary;
-    private static AtomicBoolean firstInstanceCreated = new AtomicBoolean ( false );
+    private static AtomicBoolean firstInstanceCreated = new AtomicBoolean(false);
 
     /**
      * Default application constructor. Here we additionaly put the current instance into the
      * ThreadLocal registry in case somebody will want to ask for the application istance before
      * ITMill Toolkit will call init() method.
      */
-    public TPTApplication ()
+    public TPTApplication()
     {
-        super ();
-        currentApplication.set ( this );
+        super();
+        currentApplication.set(this);
     }
 
     /**
@@ -58,22 +58,35 @@ public abstract class TPTApplication extends Application
      * their applications. But nothing stops you from overriding init() in your application, just do
      * not forget to call super.init() as the first statement in your override.
      */
-    public void init ()
+    public void init()
     {
-        currentApplication.set ( this );
+        currentApplication.set(this);
         cleanupPreviousResources();
-        getContext ().addTransactionListener ( this );
-        initializeInternationalizationFramework ();
-        applicationInit ();
+        getContext().addTransactionListener(this);
+        initializeInternationalizationFramework();
+        applicationInit();
 
-        if ( !firstInstanceCreated.getAndSet ( true ) )
+        if (!firstInstanceCreated.getAndSet(true))
         {
-            firstApplicationStartup ();
+            firstApplicationStartup();
         }
     }
 
     /**
+     * Overrides ITMill Toolkit close() method to add some resources cleanup (in the future),
+     * related to TPT. Please feel free to override this method in your application as well,
+     * however, do not forget to call super.close() in your override.
+     */
+    @Override
+    public void close()
+    {
+        getContext().removeTransactionListener(this);
+        super.close();
+    }
+
+    /**
      * Self-provider, used to gen an actual instance of the class when it is wrapped to CDI or SessionBean proxy object.
+     *
      * @return self instance
      */
     public TPTApplication getSelf()
@@ -85,37 +98,36 @@ public abstract class TPTApplication extends Application
      * Performs initialization of i18n part of TPT. It creates a dictionary, scans and loads all
      * property files from theme-name/i18n folder.
      */
-    private synchronized void initializeInternationalizationFramework ()
+    private synchronized void initializeInternationalizationFramework()
     {
-        if ( internationalizationDictionary != null )
+        if (internationalizationDictionary != null)
         {
             return;
         }
 
-        internationalizationDictionary = TM.getDictionary ( this );
-        loadInternationalizationFiles ();
+        internationalizationDictionary = TM.getDictionary(this);
+        loadInternationalizationFiles();
     }
 
     /**
      * Loads property files with translations from the theme-name/i18n folder (if exists)
      */
-    private void loadInternationalizationFiles ()
+    private void loadInternationalizationFiles()
     {
-        File themeFolder = new File ( getContext ().getBaseDirectory (),
-                String.format ( "VAADIN/themes/%s", getTheme () ) );
+        File themeFolder = new File(getContext().getBaseDirectory(),
+                                    String.format("VAADIN/themes/%s", getTheme()));
 
-        if ( themeFolder.exists () && themeFolder.isDirectory () )
+        if (themeFolder.exists() && themeFolder.isDirectory())
         {
             try
             {
-                internationalizationDictionary.loadTranslationFilesFromThemeFolder ( themeFolder );
-            }
-            catch ( IOException e )
+                internationalizationDictionary.loadTranslationFilesFromThemeFolder(themeFolder);
+            } catch (IOException e)
             {
-                System.err.println (
-                        String.format ( "Cannot load translation files from the theme folder %s",
-                        themeFolder ) );
-                e.printStackTrace ();
+                System.err.println(
+                                          String.format("Cannot load translation files from the theme folder %s",
+                                                        themeFolder));
+                e.printStackTrace();
             }
         }
     }
@@ -127,10 +139,10 @@ public abstract class TPTApplication extends Application
      * @param themeName new theme name
      */
     @Override
-    public void setTheme ( String themeName )
+    public void setTheme(String themeName)
     {
-        super.setTheme ( themeName );
-        loadInternationalizationFiles ();
+        super.setTheme(themeName);
+        loadInternationalizationFiles();
     }
 
     /**
@@ -140,7 +152,7 @@ public abstract class TPTApplication extends Application
      * to use exactly init() one, please override it but do not forget to add super.init() as
      * the first line of the overridden method.
      */
-    public abstract void applicationInit ();
+    public abstract void applicationInit();
 
     /**
      * <p>Another application initialization callback. It is called after init() / applicationInit()
@@ -149,22 +161,11 @@ public abstract class TPTApplication extends Application
      * restart) will not cause this method to be called. You can place any shared or static
      * resources initialization here, that are common to all application sessions and should be
      * initialized only once.</p>
-     *
+     * <p/>
      * <p>Please note, that if you're running your application on a cluster, this method will be called
      * in every cluster instance, so you have to care on this yourself.</p>
      */
-    public abstract void firstApplicationStartup ();
-
-    /**
-     * Overrides ITMill Toolkit close() method to add some resources cleanup (in the future),
-     * related to TPT. Please feel free to override this method in your application as well,
-     * however, do not forget to call super.close() in your override.
-     */
-    @Override
-    public void close ()
-    {
-        super.close();
-    }
+    public abstract void firstApplicationStartup();
 
     /**
      * Adds a reference to the application instance into the current thread. This allows us to get
@@ -174,12 +175,12 @@ public abstract class TPTApplication extends Application
      * @param application
      * @param o
      */
-    public void transactionStart ( Application application, Object o )
+    public void transactionStart(Application application, Object o)
     {
-       if ( application instanceof TPTApplication && ((TPTApplication)application).getSelf() == this )
-       {
-           currentApplication.set ( this );
-       }
+        if (application instanceof TPTApplication && ((TPTApplication) application).getSelf() == this)
+        {
+            currentApplication.set(this);
+        }
     }
 
     /**
@@ -188,12 +189,12 @@ public abstract class TPTApplication extends Application
      * @param application
      * @param o
      */
-    public void transactionEnd ( Application application, Object o )
+    public void transactionEnd(Application application, Object o)
     {
-       if (application instanceof TPTApplication && ((TPTApplication)application).getSelf() == this )
-       {
-           currentApplication.remove ();
-       }
+        if (application instanceof TPTApplication && ((TPTApplication) application).getSelf() == this)
+        {
+            currentApplication.remove();
+        }
     }
 
     /**
@@ -204,10 +205,10 @@ public abstract class TPTApplication extends Application
      * @param task Runnable task to execute in a separate thread
      * @return instance of the created and started thread.
      */
-    public Thread invokeLater ( Runnable task )
+    public Thread invokeLater(Runnable task)
     {
-        Thread thread = new Thread ( new TPTRunnable ( this, task ) );
-        thread.start ();
+        Thread thread = new Thread(new TPTRunnable(this, task));
+        thread.start();
         return thread;
     }
 
@@ -222,9 +223,9 @@ public abstract class TPTApplication extends Application
      *
      * @return Instance of currrent application
      */
-    public static TPTApplication getCurrentApplication ()
+    public static TPTApplication getCurrentApplication()
     {
-        return currentApplication.get ();
+        return currentApplication.get();
     }
 
     /**
@@ -236,13 +237,13 @@ public abstract class TPTApplication extends Application
     {
         // Remove all old windows, if any
         Collection<Window> oldWindows = getWindows();
-        for ( Window w : oldWindows)
+        for (Window w : oldWindows)
         {
             removeWindow(w);
         }
 
         // Remove all i18n data
-        if ( internationalizationDictionary!=null)
+        if (internationalizationDictionary != null)
         {
             internationalizationDictionary.clear();
         }
@@ -254,29 +255,27 @@ public abstract class TPTApplication extends Application
         private TPTApplication application;
         private Runnable actualTask;
 
-        public TPTRunnable ( TPTApplication app, Runnable task )
+        public TPTRunnable(TPTApplication app, Runnable task)
         {
             application = app;
             actualTask = task;
         }
 
-        public void run ()
+        public void run()
         {
             try
             {
-                application.currentApplication.set ( application );
-                actualTask.run ();
-            }
-            catch ( Throwable err )
+                application.currentApplication.set(application);
+                actualTask.run();
+            } catch (Throwable err)
             {
                 //todo: rework possible thread body exceptions handling ?
-                err.printStackTrace ();
-            }
-            finally
+                err.printStackTrace();
+            } finally
             {
-                if ( currentApplication != null )
+                if (currentApplication != null)
                 {
-                    currentApplication.remove ();
+                    currentApplication.remove();
                 }
 
                 application = null;
