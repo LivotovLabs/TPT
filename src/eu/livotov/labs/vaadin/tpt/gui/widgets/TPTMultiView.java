@@ -19,6 +19,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.UriFragmentUtility;
 import com.vaadin.ui.VerticalLayout;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -160,8 +162,8 @@ public class TPTMultiView extends VerticalLayout
             return this;
         }
         throw new IllegalArgumentException(String.format(
-                "View %s already exists. Use updateView() if you want to replace it with the new component.",
-                viewName));
+                                                                "View %s already exists. Use updateView() if you want to replace it with the new component.",
+                                                                viewName));
     }
 
     /**
@@ -183,8 +185,8 @@ public class TPTMultiView extends VerticalLayout
         } else
         {
             throw new IllegalArgumentException(String.format(
-                    "View %s already exists. Use updateView() if you want to replace it with the new component.",
-                    viewName));
+                                                                    "View %s already exists. Use updateView() if you want to replace it with the new component.",
+                                                                    viewName));
         }
     }
 
@@ -220,8 +222,8 @@ public class TPTMultiView extends VerticalLayout
             return this;
         }
         throw new IllegalArgumentException(String.format(
-                "View %s does not exists. If you want to add a new view, use method addView()",
-                viewName));
+                                                                "View %s does not exists. If you want to add a new view, use method addView()",
+                                                                viewName));
     }
 
     /**
@@ -246,7 +248,7 @@ public class TPTMultiView extends VerticalLayout
             return this;
         }
         throw new IllegalArgumentException(
-                String.format("View %s does not exists and thus cannot be removed.", viewName));
+                                                  String.format("View %s does not exists and thus cannot be removed.", viewName));
     }
 
     /**
@@ -286,7 +288,7 @@ public class TPTMultiView extends VerticalLayout
                 } catch (Throwable e)
                 {
                     throw new RuntimeException("Cannot activate lazy view: " + e.getMessage(),
-                            e);
+                                               e);
                 }
             }
 
@@ -306,7 +308,7 @@ public class TPTMultiView extends VerticalLayout
             if (!uriManagerEnabled)
             {
                 throw new IllegalArgumentException(
-                        String.format("View %s does not exists.", viewName));
+                                                          String.format("View %s does not exists.", viewName));
             }
         }
 
@@ -338,7 +340,7 @@ public class TPTMultiView extends VerticalLayout
     public boolean isViewActive(String viewName)
     {
         return isViewAvailable(viewName) && currentView != null &&
-                currentView.equalsIgnoreCase(viewName);
+                       currentView.equalsIgnoreCase(viewName);
     }
 
     /**
@@ -355,7 +357,7 @@ public class TPTMultiView extends VerticalLayout
             return views.get(viewName);
         }
         throw new IllegalArgumentException(
-                String.format("View %s does not exists.", viewName));
+                                                  String.format("View %s does not exists.", viewName));
     }
 
     /**
@@ -431,7 +433,7 @@ public class TPTMultiView extends VerticalLayout
     public void fragmentChanged(UriFragmentUtility.FragmentChangedEvent fragmentChangedEvent)
     {
         if (uriManagerEnabled &&
-                fragmentChangedEvent.getUriFragmentUtility().getFragment() != null)
+                    fragmentChangedEvent.getUriFragmentUtility().getFragment() != null)
         {
             final String fragment = fragmentChangedEvent.getUriFragmentUtility().getFragment();
 
@@ -441,46 +443,6 @@ public class TPTMultiView extends VerticalLayout
                 switchView(fragment);
             }
         }
-    }
-
-    /**
-     * An optional interface, your component representing a single view may implement. If interface
-     * is implemented, your view will receive its lifecycle events, see interface methods below. You
-     * do not need to register your view as a listener, just implement the interface and this is
-     * enough.
-     */
-    public interface TPTView
-    {
-
-        /**
-         * Called when view is activated, e.g. becomes visible to the user.
-         *
-         * @param parameters     optional view parameters, that may come from who called the method
-         *                       switchView
-         * @param previousViewId ID of the previous view. Useful for building navigation or
-         *                       historical browsing
-         */
-        public void viewActivated(String previousViewId, String parameters);
-
-        /**
-         * Called when view is deactivated, e.g. becomes hidden from a user. This usually happens if
-         * another view was swithced on.
-         *
-         * @param newViewId ID of the view that came at top
-         */
-        public void viewDeactivated(String newViewId);
-
-        /**
-         * Called when a view is attached to a multiview component, e.g. when new view was added by
-         * invoking addView method.
-         */
-        public void viewAttached();
-
-        /**
-         * Called when a view is removed from a multiview component, e.g. when view is removed by
-         * invoking a removeView method
-         */
-        public void viewRemoved();
     }
 
     /**
@@ -495,7 +457,7 @@ public class TPTMultiView extends VerticalLayout
     {
         if (view instanceof TPTView)
         {
-            ((TPTView) view).viewActivated(previousViewId, parameters);
+            ((TPTView) view).viewActivated(previousViewId, new TPTViewParameters(parameters));
         }
     }
 
@@ -579,6 +541,233 @@ public class TPTMultiView extends VerticalLayout
         } else
         {
             return viewName.substring(viewName.indexOf("/") + 1, viewName.length());
+        }
+    }
+
+
+    /**
+     * An optional interface, your component representing a single view may implement. If interface
+     * is implemented, your view will receive its lifecycle events, see interface methods below. You
+     * do not need to register your view as a listener, just implement the interface and this is
+     * enough.
+     */
+    public interface TPTView
+    {
+
+        /**
+         * Called when view is activated, e.g. becomes visible to the user.
+         *
+         * @param parameters     optional view parameters, that may come from who called the method
+         *                       switchView
+         * @param previousViewId ID of the previous view. Useful for building navigation or
+         *                       historical browsing
+         */
+        public void viewActivated(String previousViewId, TPTViewParameters parameters);
+
+        /**
+         * Called when view is deactivated, e.g. becomes hidden from a user. This usually happens if
+         * another view was swithced on.
+         *
+         * @param newViewId ID of the view that came at top
+         */
+        public void viewDeactivated(String newViewId);
+
+        /**
+         * Called when a view is attached to a multiview component, e.g. when new view was added by
+         * invoking addView method.
+         */
+        public void viewAttached();
+
+        /**
+         * Called when a view is removed from a multiview component, e.g. when view is removed by
+         * invoking a removeView method
+         */
+        public void viewRemoved();
+    }
+
+
+    public class TPTViewParameters
+    {
+
+        private String parametersString;
+        private Map<String, String> parameters = new HashMap<String, String>();
+
+        public TPTViewParameters(String parametersString)
+        {
+            this.parametersString = parametersString;
+            parseParameters();
+        }
+
+        private void parseParameters()
+        {
+            parameters.clear();
+
+            if (parametersString == null || parametersString.isEmpty())
+            {
+                return;
+            }
+
+            int p = 0;
+
+            while (p < parametersString.length())
+            {
+                int p0 = p;
+
+                while (p < parametersString.length() && parametersString.charAt(p) != '=' && parametersString.charAt(p) != '&')
+                {
+                    p++;
+                }
+
+                final String name = urlDecode(parametersString.substring(p0, p));
+
+                if (p < parametersString.length() && parametersString.charAt(p) == '=')
+                {
+                    p++;
+                }
+
+                p0 = p;
+
+                while (p < parametersString.length() && parametersString.charAt(p) != '&')
+                {
+                    p++;
+                }
+
+                final String value = urlDecode(parametersString.substring(p0, p));
+
+                if (p < parametersString.length() && parametersString.charAt(p) == '&')
+                {
+                    p++;
+                }
+
+                parameters.put(name, value);
+            }
+        }
+
+        private String urlDecode(String s)
+        {
+            try
+            {
+                return URLDecoder.decode(s, "UTF-8");
+            } catch (UnsupportedEncodingException e)
+            {
+                throw new RuntimeException("Error in urlDecode.", e);
+            }
+        }
+
+        public String getParametersString()
+        {
+            return parametersString;
+        }
+
+        public String getString(final String key)
+        {
+            return parameters.get(key);
+        }
+
+        public String getString(final String key, final String defaultValue)
+        {
+            if (parameters.containsKey(key))
+            {
+                return getString(key);
+            } else
+            {
+                return defaultValue;
+            }
+        }
+
+        public int getInt(final String key)
+        {
+            try
+            {
+                return Integer.parseInt(getString(key));
+            } catch (Throwable err)
+            {
+                return 0;
+            }
+        }
+
+        public int getInt(final String key, final int defaultValue)
+        {
+            if (parameters.containsKey(key))
+            {
+                return getInt(key);
+            } else
+            {
+                return defaultValue;
+            }
+        }
+
+        public long getLong(final String key)
+        {
+            try
+            {
+                return Long.parseLong(getString(key));
+            } catch (Throwable err)
+            {
+                return 0L;
+            }
+        }
+
+        public long getLong(final String key, final long defaultValue)
+        {
+            if (parameters.containsKey(key))
+            {
+                return getLong(key);
+            } else
+            {
+                return defaultValue;
+            }
+        }
+
+        public double getDouble(final String key)
+        {
+            try
+            {
+                return Double.parseDouble(getString(key));
+            } catch (Throwable err)
+            {
+                return 0.0;
+            }
+        }
+
+        public double getDouble(final String key, final double defaultValue)
+        {
+            if (parameters.containsKey(key))
+            {
+                return getDouble(key);
+            } else
+            {
+                return defaultValue;
+            }
+        }
+
+        public boolean getBoolean(final String key)
+        {
+            if (parameters.containsKey(key))
+            {
+                return "1".equals(parameters.get(key))
+                               || "true".equalsIgnoreCase(parameters.get(key))
+                               || "yes".equalsIgnoreCase(parameters.get(key));
+            } else
+            {
+                return false;
+            }
+        }
+
+        public boolean getBoolean(final String key, final boolean defaultValue)
+        {
+            if (parameters.containsKey(key))
+            {
+                return getBoolean(key);
+            } else
+            {
+                return defaultValue;
+            }
+        }
+
+        public Set<String> keySet()
+        {
+            return parameters.keySet();
         }
     }
 }
