@@ -13,12 +13,28 @@ import java.util.regex.Pattern;
 /**
  * (c) Livotov Labs Ltd. 2012
  * Date: 09.09.12
+ *
+ * Provides set of utility methods for dealing with Vaadin themes. Basically this class is used internally by
+ * TPT but please feel free to use all public methods in your application if you need them.
  */
 public class ThemeUtils
 {
 
+    /**
+     * RegEx pattern to detect a css @import statement in a single line of text and extract the referenced css from it.
+     */
     private final static Pattern cssImportTrapPattern = Pattern.compile("^@import.*\\\"(.*\\.css)\\\"");
 
+    /**
+     * Provides list of specified theme folder and all parent (imported) themes by reading theme css file and
+     * digging into the parent theme by following css @import statement. Note, that only first import statement
+     * is followed, as proper Vaadin theme may contain only one import of parent theme and it must be the first
+     * import statement in a file.
+     * @param context Vaadin app context
+     * @param theme theme name to dig folders for
+     * @return collection of this theme and parent theme(s) folders. The specified theme folder comes first in this
+     * collection.
+     */
     public static Collection<File> discoverThemesHierarchyOfTheme(final ApplicationContext context, final String theme)
     {
         List<File> themeFolders = new ArrayList<File>();
@@ -47,7 +63,7 @@ public class ThemeUtils
                         Matcher matcher = cssImportTrapPattern.matcher(line);
                         if (matcher.matches())
                         {
-                            File parentThemeFolder = new File(themeFolder, matcher.group(1));
+                            File parentThemeFolder = new File(themeFolder, matcher.group(1)).getParentFile();
                             themeFolders.add(parentThemeFolder);
                             digThemeFolder(themeFolders,parentThemeFolder);
                             break;
