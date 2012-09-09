@@ -586,12 +586,23 @@ public class TPTMultiView extends VerticalLayout
     }
 
 
+    /**
+     * View parameters holder. In previous versions of TPTMultiView it was possible only receive plain text single
+     * string value as a only parameter for a view. Now you can pass url query-string like named parameters
+     * as follows: http://myapp.com/app#viewName/z=1&x=456&y=true. This class parses the parameters string after "/"
+     * and provides you with the support for getting values by names. If you need entire string,
+     * use getParametersString() method
+     */
     public class TPTViewParameters
     {
 
         private String parametersString;
         private Map<String, String> parameters = new HashMap<String, String>();
 
+        /**
+         * Constructs holder and initialize it with the url-like query string
+         * @param parametersString query string in form of name1=value1&name2=value2&...
+         */
         public TPTViewParameters(String parametersString)
         {
             this.parametersString = parametersString;
@@ -654,6 +665,10 @@ public class TPTMultiView extends VerticalLayout
             }
         }
 
+        /**
+         * Provides initial (raw) query string this holder was initialized with.
+         * @return query string this holder was initialized with
+         */
         public String getParametersString()
         {
             return parametersString;
