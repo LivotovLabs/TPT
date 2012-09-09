@@ -16,7 +16,20 @@ import java.util.regex.Pattern;
  *
  * Provides set of utility methods for dealing with Vaadin themes. Basically this class is used internally by
  * TPT but please feel free to use all public methods in your application if you need them.
- */
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+*/
+
 public class ThemeUtils
 {
 
@@ -30,10 +43,11 @@ public class ThemeUtils
      * digging into the parent theme by following css @import statement. Note, that only first import statement
      * is followed, as proper Vaadin theme may contain only one import of parent theme and it must be the first
      * import statement in a file.
+     *
      * @param context Vaadin app context
-     * @param theme theme name to dig folders for
+     * @param theme   theme name to dig folders for
      * @return collection of this theme and parent theme(s) folders. The specified theme folder comes first in this
-     * collection.
+     *         collection.
      */
     public static Collection<File> discoverThemesHierarchyOfTheme(final ApplicationContext context, final String theme)
     {
@@ -65,7 +79,7 @@ public class ThemeUtils
                         {
                             File parentThemeFolder = new File(themeFolder, matcher.group(1)).getParentFile();
                             themeFolders.add(parentThemeFolder);
-                            digThemeFolder(themeFolders,parentThemeFolder);
+                            digThemeFolder(themeFolders, parentThemeFolder);
                             break;
                         }
                     }
