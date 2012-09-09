@@ -20,6 +20,7 @@ import com.vaadin.service.ApplicationContext;
 import com.vaadin.ui.Window;
 import eu.livotov.labs.vaadin.tpt.i18n.Dictionary;
 import eu.livotov.labs.vaadin.tpt.i18n.TM;
+import eu.livotov.labs.vaadin.tpt.util.ThemeUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,20 +115,19 @@ public abstract class TPTApplication extends Application
      */
     private void loadInternationalizationFiles()
     {
-        File themeFolder = new File(getContext().getBaseDirectory(),
-                                    String.format("VAADIN/themes/%s", getTheme()));
+        Collection<File> themes = ThemeUtils.discoverThemesHierarchyOfTheme(getContext(), getTheme());
 
-        if (themeFolder.exists() && themeFolder.isDirectory())
+        for (File themeFolder : themes)
         {
-            try
+            if (themeFolder.exists() && themeFolder.isDirectory())
             {
-                internationalizationDictionary.loadTranslationFilesFromThemeFolder(themeFolder);
-            } catch (IOException e)
-            {
-                System.err.println(
-                                          String.format("Cannot load translation files from the theme folder %s",
-                                                        themeFolder));
-                e.printStackTrace();
+                try
+                {
+                    internationalizationDictionary.loadTranslationFilesFromThemeFolder(themeFolder);
+                } catch (IOException e)
+                {
+                    System.err.println(String.format("Cannot load translation files from the theme folder %s : %s",themeFolder, e.getMessage()));
+                }
             }
         }
     }
