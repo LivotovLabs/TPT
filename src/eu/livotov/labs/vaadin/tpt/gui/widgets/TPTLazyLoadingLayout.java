@@ -6,6 +6,10 @@ package eu.livotov.labs.vaadin.tpt.gui.widgets;
 
 import com.vaadin.ui.*;
 import eu.livotov.labs.vaadin.tpt.TPTApplication;
+import eu.livotov.labs.vaadin.tpt.i18n.Dictionary;
+import eu.livotov.labs.vaadin.tpt.i18n.TM;
+
+import java.io.IOException;
 
 /**
  * <p>
@@ -41,6 +45,7 @@ public class TPTLazyLoadingLayout extends VerticalLayout implements Runnable
     {
         this.loader = loader;
         initUI();
+        initTranslatoins();
 
         if (loadImmideately)
         {
@@ -159,18 +164,35 @@ public class TPTLazyLoadingLayout extends VerticalLayout implements Runnable
 
         addComponent(sz1);
 
-        if (loader.getLazyLoadingMessage() != null)
-        {
-            loadingLabel.setValue(loader.getLazyLoadingMessage());
-            addComponent(loadingLabel);
-        }
+        final String message = loader.getLazyLoadingMessage();
+        loadingLabel.setValue((message!=null && !message.isEmpty()) ? message : getDefaultLoadingMessage());
 
+        addComponent(loadingLabel);
         addComponent(progressBar);
         addComponent(sz2);
         setComponentAlignment(loadingLabel, Alignment.MIDDLE_CENTER);
         setComponentAlignment(progressBar, Alignment.MIDDLE_CENTER);
         setExpandRatio(sz1, 0.5f);
         setExpandRatio(sz2, 0.5f);
+    }
+
+    private String getDefaultLoadingMessage() {
+        return TM.get("tptlll.defaultmessage");
+    }
+
+    private void initTranslatoins ()
+    {
+        Dictionary dict = TM.getDictionary();
+
+        try
+        {
+            dict.loadWords ( "en", "us",TPTLazyLoadingLayout.class.getResource ( "i18n/en_us.properties" ), false );
+            dict.loadWords ( "ru", "ru",TPTLazyLoadingLayout.class.getResource ( "i18n/ru_ru.properties" ), false );
+        }
+        catch ( IOException io )
+        {
+            //no-op
+        }
     }
 
     protected void initUI()
