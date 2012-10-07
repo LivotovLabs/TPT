@@ -17,11 +17,14 @@ package eu.livotov.labs.vaadin.tpt;
 
 import com.vaadin.Application;
 import com.vaadin.service.ApplicationContext;
+import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.Window;
 import eu.livotov.labs.vaadin.tpt.i18n.Dictionary;
 import eu.livotov.labs.vaadin.tpt.i18n.TM;
 import eu.livotov.labs.vaadin.tpt.util.ThemeUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -34,8 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * applicationInit(). However, you may still init(), just do not forget to put super.init() at
  * the beginning (as the first line of your overridden method body).
  */
-public abstract class TPTApplication extends Application
-        implements ApplicationContext.TransactionListener
+public abstract class TPTApplication extends Application implements HttpServletRequestListener
 {
 
     static ThreadLocal<TPTApplication> currentApplication = new ThreadLocal<TPTApplication>();
@@ -63,7 +65,6 @@ public abstract class TPTApplication extends Application
     {
         currentApplication.set(this);
         cleanupPreviousResources();
-        getContext().addTransactionListener(this);
         initializeInternationalizationFramework();
         applicationInit();
 
@@ -81,7 +82,6 @@ public abstract class TPTApplication extends Application
     @Override
     public void close()
     {
-        getContext().removeTransactionListener(this);
         super.close();
     }
 
@@ -171,30 +171,16 @@ public abstract class TPTApplication extends Application
      * Adds a reference to the application instance into the current thread. This allows us to get
      * an application instance by calling ToolkitPlusApplication.getCurrentApplication() in any place of your
      * application code.
-     *
-     * @param application
-     * @param o
      */
-    public void transactionStart(Application application, Object o)
-    {
-        if (application instanceof TPTApplication && ((TPTApplication) application).getSelf() == this)
-        {
-            currentApplication.set(this);
-        }
+    public void onRequestStart(HttpServletRequest request, HttpServletResponse response) {
+        currentApplication.set(getSelf());
     }
 
     /**
      * Once thread finishes, removes the application instance reference from it.
-     *
-     * @param application
-     * @param o
      */
-    public void transactionEnd(Application application, Object o)
-    {
-        if (application instanceof TPTApplication && ((TPTApplication) application).getSelf() == this)
-        {
-            currentApplication.remove();
-        }
+    public void onRequestEnd(HttpServletRequest request, HttpServletResponse response) {
+        currentApplication.remove();
     }
 
     /**
