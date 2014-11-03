@@ -22,7 +22,8 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class TPTMessagePanel extends VerticalLayout
 {
- 
+    protected Component messageComponent;
+
     /**
      * Constructs an empty (with no message) panel.
      */
@@ -52,24 +53,24 @@ public class TPTMessagePanel extends VerticalLayout
     {
         this();
 
-        Label msg = new Label(message);
-        msg.setWidth(null);
+        messageComponent = new Label(message);
+        messageComponent.setWidth(null);
 
         TPTSizer s1 = new TPTSizer(null, "100%");
         TPTSizer s2 = new TPTSizer(null, "100%");
 
         addComponent(s1);
-        addComponent(msg);
+        addComponent(messageComponent);
         addComponent(s2);
 
-        setComponentAlignment(msg, Alignment.MIDDLE_CENTER);
+        setComponentAlignment(messageComponent, Alignment.MIDDLE_CENTER);
 
         setExpandRatio(s1, 0.5f);
         setExpandRatio(s2, 0.5f);
 
         if ( icon != null)
         {
-            msg.setIcon(icon);
+            messageComponent.setIcon(icon);
         }
     }
 
@@ -82,11 +83,13 @@ public class TPTMessagePanel extends VerticalLayout
     {
         this();
 
+        messageComponent = component;
+
         TPTSizer s1 = new TPTSizer(null, "100%");
         TPTSizer s2 = new TPTSizer(null, "100%");
 
         addComponent(s1);
-        addComponent(component);
+        addComponent(messageComponent);
         addComponent(s2);
 
         setComponentAlignment(component, Alignment.MIDDLE_CENTER);
@@ -95,4 +98,7 @@ public class TPTMessagePanel extends VerticalLayout
         setExpandRatio(s2, 0.5f);
     }
 
+    public Component getMessageComponent() {
+        return messageComponent;
+    }
 }

@@ -249,6 +249,11 @@ public class TPTMultiView extends VerticalLayout
                                                   String.format("View %s does not exists and thus cannot be removed.", viewName));
     }
 
+    public void switchView(String viewId, String parametersString)
+    {
+        switchView(viewId + "/" + parametersString);
+    }
+
     /**
      * Switches the active view to a new one, causing display to update. You may also switch to a
      * null view in order to clear the display. <p>If you'll try to switch to a view that does not
