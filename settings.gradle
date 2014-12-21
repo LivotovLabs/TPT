@@ -1,0 +1,6 @@
+include 'tpt-addon'
+include 'tpt-demo'
+
+rootProject.name = 'tpt'
+
+

@@ -1,9 +1,7 @@
 *.class
 .idea
-out
+/out
 *.jpr
 *.iml
-
-# Package Files #
-*.war
-*.ear
+.gradle
+local.properties

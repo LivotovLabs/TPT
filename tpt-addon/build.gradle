@@ -1,0 +1,25 @@
+apply plugin: 'java'
+apply from: 'http://plugins.jasoft.fi/vaadin.plugin'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    providedCompile 'com.vaadin:vaadin-client:7.3.3' // only for IDEA syntax highlite
+}
+
+jar {
+    from sourceSets.main.allJava
+}
+
+vaadin.version = '7.3.3'
+vaadin.push = false
+vaadin.debug = false
+vaadin.profiler = false
+vaadin.addon.author = 'Livotov Labs Ltd.'
+vaadin.addon.license = 'Apache 2.0'
+vaadin.addon.title = 'Toolkit Productivity Tools Generation 3'
+version = VERSION_NAME
+
+apply from: '../maven-push.gradle'

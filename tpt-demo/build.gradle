@@ -1,0 +1,19 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply from: 'http://plugins.jasoft.fi/vaadin.plugin'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':tpt-addon')
+    providedCompile 'javax:javaee-api:7.0'
+    providedCompile 'javax.servlet:servlet-api:3+'
+    providedCompile 'com.vaadin:vaadin-client:7.3.3' // only for IDEA syntax highlite
+}
+
+vaadin.version = '7.3.3'
+vaadin.push = false
+vaadin.debug = false
+vaadin.profiler = false
