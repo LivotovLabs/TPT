@@ -1,3 +1,15 @@
+Retirement Notice
+=================
+
+This project is retired and no longer maintained. 
+
+ITMill/Vaadin toolkit is a very mature product nowadays and with a lot of 3-rd party plugins and extensions. TPT was initially created to cover the missing pieces
+and simplify the life of a early Vaadin users. Right now there are much more better extensions present in the Vaadin Directory so I encourage you to go there
+and grab one(s) to fulfill your needs. 
+
+
+
+
 Vaadin Toolkit Productivity Tools
 =================================
 
